@@ -185,17 +185,7 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
     });
   }, [initialStudents, debouncedSearchQuery, sortBy, sortDirection, filterResult, filterSection, scope]);
 
-  // Analytics uses section + result filter but NOT search
-  const analyticsStudents = useMemo(() => {
-    let list = initialStudents;
-    if (scope.startsWith("SUB_")) {
-      const subjName = scope.replace("SUB_", "");
-      list = list.filter(s => s.subjects.some(sub => sub.subjectName === subjName));
-    }
-    if (filterResult !== "ALL") list = list.filter((s) => s.result === filterResult);
-    if (filterSection !== "ALL") list = list.filter((s) => s.section === filterSection);
-    return list;
-  }, [initialStudents, filterResult, filterSection, scope]);
+
 
   // Compute ranks to handle ties
   const studentRanks = useMemo(() => {
@@ -413,8 +403,8 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
           </div>
 
           {/* ── Analytics Panel ── */}
-          {showAnalytics && analyticsStudents.length > 0 && (
-            <Analytics students={analyticsStudents} scope={scope} />
+          {showAnalytics && filteredStudents.length > 0 && (
+            <Analytics students={filteredStudents} scope={scope} />
           )}
 
           {/* ── Empty ── */}

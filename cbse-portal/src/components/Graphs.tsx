@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   Cell
 } from "recharts";
@@ -111,16 +111,16 @@ export default function Graphs({ overall, classStats, subjectAvgs, subjectClassA
           <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Subject Averages by Section</h3>
           <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={subjectClassAvgs.slice(0, 5)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={subjectClassAvgs.slice(0, 5)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                 <XAxis dataKey="subjectName" stroke={textColor} fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} domain={[0, 100]} />
+                <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} domain={['dataMin - 5', 100]} />
                 <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                 <Legend wrapperStyle={{ fontSize: '12px', color: textColor }} />
                 {sections.map((sec, idx) => (
-                  <Bar key={sec} dataKey={sec} name={sec} fill={SECTION_COLORS[idx % SECTION_COLORS.length]} radius={[2, 2, 0, 0]} />
+                  <Line key={sec} type="monotone" dataKey={sec} name={sec} stroke={SECTION_COLORS[idx % SECTION_COLORS.length]} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 ))}
-              </BarChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
           <p className="text-[10px] text-slate-400 text-center mt-2">Showing top 5 subjects by volume</p>
