@@ -98,6 +98,7 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   
   const [sortBy, setSortBy] = useState<SortKey>("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [filterResult, setFilterResult] = useState<ResultFilter>("ALL");
   const [filterSection, setFilterSection] = useState<string>("ALL");
   const [scope, setScope] = useState<SubjectScope>("best5");
@@ -129,14 +130,15 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
     if (filterSection !== "ALL") list = list.filter((s) => s.section === filterSection);
 
     return [...list].sort((a, b) => {
-      if (sortBy === "name") return a.name.localeCompare(b.name);
-      if (sortBy === "roll") return a.rollNumber.localeCompare(b.rollNumber);
-      if (sortBy === "marks" || sortBy === "percent") {
-        return getScopedTotal(b, scope) - getScopedTotal(a, scope);
+      let diff = 0;
+      if (sortBy === "name") diff = a.name.localeCompare(b.name);
+      else if (sortBy === "roll") diff = a.rollNumber.localeCompare(b.rollNumber);
+      else if (sortBy === "marks" || sortBy === "percent") {
+        diff = getScopedTotal(a, scope) - getScopedTotal(b, scope);
       }
-      return 0;
+      return sortDirection === "asc" ? diff : -diff;
     });
-  }, [initialStudents, debouncedSearchQuery, sortBy, filterResult, filterSection, scope]);
+  }, [initialStudents, debouncedSearchQuery, sortBy, sortDirection, filterResult, filterSection, scope]);
 
   // Analytics uses section + result filter but NOT search
   const analyticsStudents = useMemo(() => {
@@ -146,8 +148,27 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
     return list;
   }, [initialStudents, filterResult, filterSection]);
 
+  // Compute ranks to handle ties
+  const studentRanks = useMemo(() => {
+    if (sortBy !== "marks" && sortBy !== "percent") return [];
+    const ranks: number[] = [];
+    let currentRank = 1;
+    for (let i = 0; i < filteredStudents.length; i++) {
+      if (i > 0) {
+        const prevMarks = getScopedTotal(filteredStudents[i - 1], scope);
+        const currMarks = getScopedTotal(filteredStudents[i], scope);
+        const changed = sortDirection === "desc" ? currMarks < prevMarks : currMarks > prevMarks;
+        if (changed) {
+          currentRank = i + 1; // Standard competition ranking
+        }
+      }
+      ranks.push(currentRank);
+    }
+    return ranks;
+  }, [filteredStudents, sortBy, scope, sortDirection]);
+
   // Reset pagination on any filter change
-  useEffect(() => { setDisplayedCount(PAGE_SIZE); }, [debouncedSearchQuery, sortBy, filterResult, filterSection, scope]);
+  useEffect(() => { setDisplayedCount(PAGE_SIZE); }, [debouncedSearchQuery, sortBy, sortDirection, filterResult, filterSection, scope]);
 
   // Infinite scroll
   const loadMore = useCallback(() => {
@@ -283,13 +304,25 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                     { value: "roll" as SortKey, label: "Roll" },
                   ]).map((opt) => (
                     <button key={opt.value}
-                      onClick={() => setSortBy(opt.value)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                      onClick={() => {
+                        if (sortBy === opt.value) {
+                          setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+                        } else {
+                          setSortBy(opt.value);
+                          setSortDirection((opt.value === "marks" || opt.value === "percent") ? "desc" : "asc");
+                        }
+                      }}
+                      className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                         sortBy === opt.value
                           ? "bg-blue-600 text-white shadow-sm"
                           : "text-slate-500 hover:text-slate-700"
                       }`}>
                       {opt.label}
+                      {sortBy === opt.value && (
+                        <svg className={`w-3.5 h-3.5 transition-transform ${sortDirection === "asc" ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -346,7 +379,7 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                   key={student.rollNumber}
                   student={student}
                   scope={scope}
-                  rank={(sortBy === "marks" || sortBy === "percent") ? i + 1 : undefined}
+                  rank={(sortBy === "marks" || sortBy === "percent") ? studentRanks[i] : undefined}
                 />
               ))}
             </div>
