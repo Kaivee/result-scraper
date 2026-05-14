@@ -112,16 +112,29 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Dynamic section list
+  // Dynamic section & subject lists
   const sections = useMemo(() => {
     const s = Array.from(new Set(initialStudents.map((s) => s.section))).sort();
     return ["ALL", ...s];
+  }, [initialStudents]);
+
+  const subjectList = useMemo(() => {
+    const set = new Set<string>();
+    initialStudents.forEach(s => s.subjects.forEach(sub => {
+       if (sub.subjectName) set.add(sub.subjectName);
+    }));
+    return Array.from(set).sort();
   }, [initialStudents]);
 
   // Filter + sort (using debounced query)
   const filteredStudents = useMemo(() => {
     const q = debouncedSearchQuery.toLowerCase().trim();
     let list = initialStudents;
+
+    if (scope.startsWith("SUB_")) {
+      const subjName = scope.replace("SUB_", "");
+      list = list.filter(s => s.subjects.some(sub => sub.subjectName === subjName));
+    }
 
     if (q) list = list.filter((s) =>
       s.name.toLowerCase().includes(q) || s.rollNumber.toLowerCase().includes(q)
@@ -143,10 +156,14 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
   // Analytics uses section + result filter but NOT search
   const analyticsStudents = useMemo(() => {
     let list = initialStudents;
+    if (scope.startsWith("SUB_")) {
+      const subjName = scope.replace("SUB_", "");
+      list = list.filter(s => s.subjects.some(sub => sub.subjectName === subjName));
+    }
     if (filterResult !== "ALL") list = list.filter((s) => s.result === filterResult);
     if (filterSection !== "ALL") list = list.filter((s) => s.section === filterSection);
     return list;
-  }, [initialStudents, filterResult, filterSection]);
+  }, [initialStudents, filterResult, filterSection, scope]);
 
   // Compute ranks to handle ties
   const studentRanks = useMemo(() => {
@@ -233,22 +250,36 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider shrink-0">Subjects:</span>
-                <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
-                  {scopeOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setScope(opt.value)}
-                      title={opt.desc}
-                      className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap ${
-                        scope === opt.value
-                          ? "bg-blue-600 text-white shadow-sm"
-                          : "text-slate-500 hover:text-slate-700"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
+                <select
+                  value={scope.startsWith("SUB_") ? scope : "ALL"}
+                  onChange={(e) => {
+                    if (e.target.value === "ALL") setScope("best5");
+                    else setScope(e.target.value);
+                  }}
+                  className="text-xs bg-slate-100 border-0 rounded-lg px-2 py-2 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer max-w-[150px] sm:max-w-none truncate"
+                >
+                  <option value="ALL">All Subjects</option>
+                  {subjectList.map(s => <option key={s} value={`SUB_${s}`}>{s}</option>)}
+                </select>
+                
+                {!scope.startsWith("SUB_") && (
+                  <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                    {scopeOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setScope(opt.value)}
+                        title={opt.desc}
+                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap ${
+                          scope === opt.value
+                            ? "bg-blue-600 text-white shadow-sm"
+                            : "text-slate-500 hover:text-slate-700"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {scope === "best5" && (
                   <span className="text-[10px] text-blue-500 bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5 hidden sm:block">
                     English locked ✓

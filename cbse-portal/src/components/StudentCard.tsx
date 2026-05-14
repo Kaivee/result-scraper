@@ -116,7 +116,7 @@ export default function StudentCard({ student, scope, rank }: StudentCardProps) 
   const pct = scopedMax > 0 ? ((scopedTotal / scopedMax) * 100).toFixed(1) : "0.0";
   const isPassed = student.result === "PASS";
 
-  const scopeLabel = scope === "best5" ? "Best-5" : scope === "first5" ? "First-5" : "All-6";
+  const scopeLabel = scope === "best5" ? "Best-5" : scope === "first5" ? "First-5" : scope === "all6" ? "All-6" : scope.replace("SUB_", "");
 
   return (
     <article

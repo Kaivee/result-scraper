@@ -45,7 +45,7 @@ export interface ParsedStudent {
   raw: StudentData;
 }
 
-export type SubjectScope = "best5" | "first5" | "all6";
+export type SubjectScope = "best5" | "first5" | "all6" | string;
 
 // ─── Parser ───────────────────────────────────────────────────────────────────
 
@@ -90,6 +90,11 @@ export function getScopedSubjects(student: ParsedStudent, scope: SubjectScope): 
   const { subjects } = student;
   if (scope === "all6") return subjects;
   if (scope === "first5") return subjects.slice(0, 5);
+  if (scope.startsWith("SUB_")) {
+    const subjName = scope.replace("SUB_", "");
+    const subj = subjects.find((s) => s.subjectName === subjName);
+    return subj ? [subj] : [];
+  }
   const english = subjects.find((s) => s.slotIndex === 0);
   const best4 = [...subjects.filter((s) => s.slotIndex !== 0)]
     .sort((a, b) => (b.total ?? 0) - (a.total ?? 0)).slice(0, 4);
@@ -100,7 +105,7 @@ export const getScopedTotal = (s: ParsedStudent, sc: SubjectScope) =>
   getScopedSubjects(s, sc).reduce((acc, sub) => acc + (sub.total ?? 0), 0);
 
 export const getScopedMax = (s: ParsedStudent, sc: SubjectScope) =>
-  getScopedSubjects(s, sc).length * 100;
+  sc.startsWith("SUB_") ? 100 : getScopedSubjects(s, sc).length * 100;
 
 // ─── Analytics types ──────────────────────────────────────────────────────────
 
