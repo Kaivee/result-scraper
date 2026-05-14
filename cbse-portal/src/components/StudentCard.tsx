@@ -133,7 +133,7 @@ export default function StudentCard({ student, scope, rank }: StudentCardProps) 
       >
         <div className="flex items-start justify-between gap-3">
           {/* Avatar + Info */}
-          <div className="flex items-start gap-3">
+          <div className="flex flex-1 items-start gap-3 min-w-0">
             <div className="relative flex-shrink-0">
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold ${
                 student.sex === "F" ? "bg-pink-100 text-pink-700" : "bg-blue-100 text-blue-700"

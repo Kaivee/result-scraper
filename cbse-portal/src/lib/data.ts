@@ -63,9 +63,9 @@ export function parseStudent(data: StudentData): ParsedStudent {
     .filter((s) => s.name?.trim())
     .map((s) => ({
       subjectName: s.name, subjectCode: s.code,
-      theory: s.t !== "" ? parseInt(s.t, 10) : null,
-      practical: s.p !== "" ? parseInt(s.p, 10) : null,
-      total: s.tot !== "" ? parseInt(s.tot, 10) : null,
+      theory: s.t && !isNaN(parseInt(s.t, 10)) ? parseInt(s.t, 10) : null,
+      practical: s.p && !isNaN(parseInt(s.p, 10)) ? parseInt(s.p, 10) : null,
+      total: s.tot && !isNaN(parseInt(s.tot, 10)) ? parseInt(s.tot, 10) : null,
       grade: s.grade, passFail: s.pf === "P" ? "Pass" : s.pf === "F" ? "Fail" : s.pf,
       totalInWords: s.words, slotIndex: s.slotIndex,
     }));
