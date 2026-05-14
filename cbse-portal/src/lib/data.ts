@@ -127,6 +127,11 @@ export interface ClassStats {
 
 export interface SubjectAvg { subjectName: string; avgMarks: number; avgPct: number; count: number; topper: string; topperMarks: number; }
 
+export interface SubjectClassAvg {
+  subjectName: string;
+  [section: string]: number | string;
+}
+
 // ─── Analytics helpers ────────────────────────────────────────────────────────
 
 const _mean = (v: number[]) => v.length ? parseFloat((v.reduce((a, b) => a + b, 0) / v.length).toFixed(2)) : 0;
@@ -223,4 +228,35 @@ export function computeSubjectAverages(students: ParsedStudent[]): SubjectAvg[] 
       topperMarks: d.topperMarks
     }))
     .sort((a, b) => b.avgMarks - a.avgMarks);
+}
+
+export function computeSubjectClassAverages(students: ParsedStudent[]): SubjectClassAvg[] {
+  const map: Record<string, Record<string, { total: number, count: number }>> = {};
+  
+  students.forEach((s) => {
+    const sec = s.section || "Unknown";
+    s.subjects.forEach((sub) => {
+      if (sub.total !== null) {
+        if (!map[sub.subjectName]) map[sub.subjectName] = {};
+        if (!map[sub.subjectName][sec]) map[sub.subjectName][sec] = { total: 0, count: 0 };
+        
+        map[sub.subjectName][sec].total += sub.total;
+        map[sub.subjectName][sec].count += 1;
+      }
+    });
+  });
+
+  return Object.entries(map).map(([subjectName, sections]) => {
+    const result: SubjectClassAvg = { subjectName };
+    let totalOverall = 0;
+    let countOverall = 0;
+    Object.entries(sections).forEach(([sec, data]) => {
+      result[sec] = parseFloat((data.total / data.count).toFixed(1));
+      totalOverall += data.total;
+      countOverall += data.count;
+    });
+    // Add an overall average for sorting purposes, though we might not render it as a bar
+    result.overallAvg = parseFloat((totalOverall / countOverall).toFixed(1));
+    return result;
+  }).sort((a, b) => (b.overallAvg as number) - (a.overallAvg as number));
 }

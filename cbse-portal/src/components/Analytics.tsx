@@ -3,8 +3,9 @@
 import { useState, useMemo } from "react";
 import {
   ParsedStudent, SubjectScope,
-  computeOverallStats, computeClassStats, computeSubjectAverages,
+  computeOverallStats, computeClassStats, computeSubjectAverages, computeSubjectClassAverages
 } from "@/lib/data";
+import Graphs from "./Graphs";
 
 interface AnalyticsProps {
   students: ParsedStudent[];
@@ -49,11 +50,11 @@ function HBar({ label, value, max, color }: { label: string; value: number; max:
 }
 
 export default function Analytics({ students, scope }: AnalyticsProps) {
-  const [tab, setTab] = useState<"overview" | "classwise" | "subjects">("overview");
 
   const overall = useMemo(() => computeOverallStats(students, scope), [students, scope]);
   const classStats = useMemo(() => computeClassStats(students, scope), [students, scope]);
   const subjectAvgs = useMemo(() => computeSubjectAverages(students), [students]);
+  const subjectClassAvgs = useMemo(() => computeSubjectClassAverages(students), [students]);
 
   const maxGradeCount = Math.max(...Object.values(overall.gradeDistribution), 1);
   const maxDistCount = Math.max(...overall.marksDistribution.map((b) => b.count), 1);
@@ -64,7 +65,10 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
     { id: "overview" as const, label: "Overview" },
     { id: "classwise" as const, label: "Class-wise" },
     { id: "subjects" as const, label: "Subject-wise" },
+    { id: "graphs" as const, label: "Graphs" },
   ];
+
+  const [tab, setTab] = useState<typeof tabs[number]["id"]>("overview");
 
   if (!students.length) return null;
 
@@ -326,7 +330,14 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
                 </tbody>
               </table>
             </div>
-          </div>
+        {/* ─── GRAPHS TAB ─── */}
+        {tab === "graphs" && (
+          <Graphs 
+            overall={overall}
+            classStats={classStats}
+            subjectAvgs={subjectAvgs}
+            subjectClassAvgs={subjectClassAvgs}
+          />
         )}
       </div>
     </div>
