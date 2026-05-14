@@ -16,9 +16,10 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 // ─── Navbar (inlined) ─────────────────────────────────────────────────────────
-function Navbar({ searchQuery, onSearchChange, totalCount, filteredCount }: {
+function Navbar({ searchQuery, onSearchChange, totalCount, filteredCount, isDark, toggleDark }: {
   searchQuery: string; onSearchChange: (q: string) => void;
   totalCount: number; filteredCount: number;
+  isDark: boolean; toggleDark: () => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,8 +31,8 @@ function Navbar({ searchQuery, onSearchChange, totalCount, filteredCount }: {
     return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("keydown", onKey); };
   }, []);
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-slate-200 ${
-      scrolled ? "shadow-md backdrop-blur-md bg-white/95" : ""
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 ${
+      scrolled ? "shadow-md backdrop-blur-md bg-white/95 dark:bg-slate-900/95" : ""
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
@@ -43,7 +44,7 @@ function Navbar({ searchQuery, onSearchChange, totalCount, filteredCount }: {
               </svg>
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-base font-bold text-slate-800 tracking-tight">CBSE Results 2026</span>
+              <span className="text-base font-bold text-slate-800 dark:text-slate-50 tracking-tight">CBSE Results 2026</span>
               <span className="text-xs text-blue-600 font-medium hidden sm:block">Class XII · Official Portal</span>
             </div>
           </div>
@@ -54,27 +55,34 @@ function Navbar({ searchQuery, onSearchChange, totalCount, filteredCount }: {
             <input id="navbar-search" ref={inputRef} type="text" value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search by name or roll number…"
-              className="w-full pl-9 pr-16 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all placeholder:text-slate-400 text-slate-700"
+              className="w-full pl-9 pr-16 py-2 text-sm bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 transition-all placeholder:text-slate-400 text-slate-700 dark:text-slate-200"
               aria-label="Search students" />
             {searchQuery
               ? <button onClick={() => onSearchChange("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" aria-label="Clear">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
-              : <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-100 border border-slate-200 rounded">⌘K</kbd>
+              : <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded">⌘K</kbd>
             }
           </div>
           
           <div className="flex items-center gap-3 shrink-0">
-            <button className="hidden sm:flex items-center gap-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg px-3 py-1.5 transition-colors">
+            <button onClick={toggleDark} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors bg-slate-50 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700" aria-label="Toggle dark mode">
+              {isDark ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+              )}
+            </button>
+            <button className="hidden sm:flex items-center gap-2 text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-1.5 transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
               Download PDF Summary
             </button>
-            <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5">
+            <div className="hidden md:flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full px-3 py-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-medium text-slate-600">
-                {filteredCount.toLocaleString()}{filteredCount !== totalCount && <span className="text-slate-400"> / {totalCount.toLocaleString()}</span>} students
+              <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                {filteredCount.toLocaleString()}{filteredCount !== totalCount && <span className="text-slate-400 dark:text-slate-500"> / {totalCount.toLocaleString()}</span>} students
               </span>
             </div>
           </div>
@@ -102,6 +110,30 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
   const [filterResult, setFilterResult] = useState<ResultFilter>("ALL");
   const [filterSection, setFilterSection] = useState<string>("ALL");
   const [scope, setScope] = useState<SubjectScope>("best5");
+
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleDark = useCallback(() => {
+    setIsDark(prev => {
+      const next = !prev;
+      if (next) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      return next;
+    });
+  }, []);
 
   const [displayedCount, setDisplayedCount] = useState(PAGE_SIZE);
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -218,11 +250,13 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
         onSearchChange={setSearchQuery}
         totalCount={initialStudents.length}
         filteredCount={filteredStudents.length}
+        isDark={isDark}
+        toggleDark={toggleDark}
       />
 
-      <main className="min-h-screen bg-slate-50 pt-16 pb-12">
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-16 pb-12 transition-colors duration-300">
         {/* Hero */}
-        <div className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-900 text-white">
+        <div className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-900 dark:from-slate-900 dark:via-blue-950 dark:to-slate-900 text-white transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
@@ -246,24 +280,24 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
 
           {/* ── Filter & Control Bar ── */}
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 space-y-3">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-4 space-y-3 transition-colors duration-300">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider shrink-0">Subjects:</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider shrink-0">Subjects:</span>
                 <select
                   value={scope.startsWith("SUB_") ? scope : "ALL"}
                   onChange={(e) => {
                     if (e.target.value === "ALL") setScope("best5");
                     else setScope(e.target.value);
                   }}
-                  className="text-xs bg-slate-100 border-0 rounded-lg px-2 py-2 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer max-w-[150px] sm:max-w-none truncate"
+                  className="text-xs bg-slate-100 dark:bg-slate-800 border-0 rounded-lg px-2 py-2 text-slate-700 dark:text-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer max-w-[150px] sm:max-w-none truncate"
                 >
                   <option value="ALL">All Subjects</option>
                   {subjectList.map(s => <option key={s} value={`SUB_${s}`}>{s}</option>)}
                 </select>
                 
                 {!scope.startsWith("SUB_") && (
-                  <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
                     {scopeOptions.map((opt) => (
                       <button
                         key={opt.value}
@@ -272,7 +306,7 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                         className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all whitespace-nowrap ${
                           scope === opt.value
                             ? "bg-blue-600 text-white shadow-sm"
-                            : "text-slate-500 hover:text-slate-700"
+                            : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                         }`}
                       >
                         {opt.label}
@@ -281,17 +315,17 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                   </div>
                 )}
                 {scope === "best5" && (
-                  <span className="text-[10px] text-blue-500 bg-blue-50 border border-blue-100 rounded px-1.5 py-0.5 hidden sm:block">
+                  <span className="text-[10px] text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded px-1.5 py-0.5 hidden sm:block">
                     English locked ✓
                   </span>
                 )}
               </div>
 
-              <div className="h-5 border-l border-slate-200 hidden sm:block" />
+              <div className="h-5 border-l border-slate-200 dark:border-slate-700 hidden sm:block" />
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider shrink-0">Result:</span>
-                <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider shrink-0">Result:</span>
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
                   {(["ALL", "PASS", "FAIL"] as const).map((val) => (
                     <button key={val}
                       onClick={() => setFilterResult(val)}
@@ -299,8 +333,8 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                         filterResult === val
                           ? val === "PASS" ? "bg-emerald-600 text-white shadow-sm"
                           : val === "FAIL" ? "bg-red-600 text-white shadow-sm"
-                          : "bg-white text-slate-700 shadow-sm"
-                          : "text-slate-500 hover:text-slate-700"
+                          : "bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-100 shadow-sm"
+                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                       }`}>
                       {val}
                     </button>
@@ -308,14 +342,14 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                 </div>
               </div>
 
-              <div className="h-5 border-l border-slate-200 hidden sm:block" />
+              <div className="h-5 border-l border-slate-200 dark:border-slate-700 hidden sm:block" />
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider shrink-0">Class:</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider shrink-0">Class:</span>
                 <select
                   value={filterSection}
                   onChange={(e) => setFilterSection(e.target.value)}
-                  className="text-xs bg-slate-100 border-0 rounded-lg px-3 py-2 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                  className="text-xs bg-slate-100 dark:bg-slate-800 border-0 rounded-lg px-3 py-2 text-slate-700 dark:text-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   {sections.map((sec) => (
                     <option key={sec} value={sec}>{sec === "ALL" ? "All Sections" : sec}</option>
@@ -324,10 +358,10 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Sort:</span>
-                <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Sort:</span>
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
                   {([
                     { value: "name" as SortKey, label: "Name" },
                     { value: "marks" as SortKey, label: "Marks" },
@@ -346,7 +380,7 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                       className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                         sortBy === opt.value
                           ? "bg-blue-600 text-white shadow-sm"
-                          : "text-slate-500 hover:text-slate-700"
+                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                       }`}>
                       {opt.label}
                       {sortBy === opt.value && (
@@ -365,7 +399,7 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold border transition-all ${
                     showAnalytics
                       ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600"
+                      : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 hover:text-blue-600 dark:hover:text-blue-400"
                   }`}
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,13 +420,13 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
           {/* ── Empty ── */}
           {filteredStudents.length === 0 && (
             <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
-              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
                 </svg>
               </div>
-              <p className="text-slate-700 font-semibold">No students found</p>
-              <p className="text-slate-400 text-sm">Try adjusting your filters or search query</p>
+              <p className="text-slate-700 dark:text-slate-300 font-semibold">No students found</p>
+              <p className="text-slate-400 dark:text-slate-500 text-sm">Try adjusting your filters or search query</p>
               <button
                 onClick={() => { setSearchQuery(""); setFilterResult("ALL"); setFilterSection("ALL"); }}
                 className="mt-1 text-blue-600 hover:text-blue-800 text-sm font-medium underline underline-offset-2"
@@ -426,7 +460,7 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
           {/* End of list */}
           {!hasMore && displayedStudents.length > 0 && (
             <div className="text-center py-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full text-xs text-slate-400 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full text-xs text-slate-400 dark:text-slate-500 shadow-sm">
                 <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
@@ -437,8 +471,8 @@ export default function ClientPage({ initialStudents }: { initialStudents: Parse
         </div>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400 dark:text-slate-500">
           <p>© 2026 CBSE Results Portal · Amity International School, Sec 46 Gurgaon</p>
           <p>For official results, visit <span className="text-blue-500">cbse.gov.in</span></p>
         </div>

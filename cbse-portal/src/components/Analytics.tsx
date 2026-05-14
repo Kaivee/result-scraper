@@ -17,11 +17,11 @@ const GRADE_COLORS: Record<string, string> = {
   C1: "bg-violet-500", C2: "bg-purple-500", D: "bg-amber-500", E: "bg-red-500",
 };
 
-function StatCard({ label, value, sub, color = "text-slate-800" }: {
+function StatCard({ label, value, sub, color = "text-slate-800 dark:text-slate-100" }: {
   label: string; value: string; sub?: string; color?: string;
 }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm transition-colors">
       <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{label}</p>
       <p className={`text-2xl font-extrabold mt-1 ${color}`}>{value}</p>
       {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
@@ -33,8 +33,8 @@ function HBar({ label, value, max, color }: { label: string; value: number; max:
   const pct = max > 0 ? (value / max) * 100 : 0;
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs text-slate-500 w-8 shrink-0 font-medium">{label}</span>
-      <div className="flex-1 h-5 bg-slate-100 rounded-md overflow-hidden relative">
+      <span className="text-xs text-slate-500 dark:text-slate-400 w-8 shrink-0 font-medium">{label}</span>
+      <div className="flex-1 h-5 bg-slate-100 dark:bg-slate-800 rounded-md overflow-hidden relative">
         <div
           className={`h-full rounded-md transition-all duration-500 ${color}`}
           style={{ width: `${pct}%` }}
@@ -43,7 +43,7 @@ function HBar({ label, value, max, color }: { label: string; value: number; max:
           {value}
         </span>
       </div>
-      <span className="text-xs text-slate-400 w-10 text-right shrink-0">{pct.toFixed(1)}%</span>
+      <span className="text-xs text-slate-400 dark:text-slate-500 w-10 text-right shrink-0">{pct.toFixed(1)}%</span>
     </div>
   );
 }
@@ -69,10 +69,10 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
   if (!students.length) return null;
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden transition-colors">
       {/* Tab bar */}
-      <div className="flex border-b border-slate-200">
-        <div className="px-5 py-3 flex items-center gap-1 text-xs font-semibold text-slate-400 uppercase tracking-wider border-r border-slate-100">
+      <div className="flex border-b border-slate-200 dark:border-slate-800">
+        <div className="px-5 py-3 flex items-center gap-1 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-r border-slate-100 dark:border-slate-800">
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -86,8 +86,8 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
             onClick={() => setTab(t.id)}
             className={`px-5 py-3 text-sm font-medium transition-all border-b-2 -mb-px ${
               tab === t.id
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-slate-500 hover:text-slate-700"
+                ? "border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500"
+                : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             {t.label}
@@ -120,7 +120,7 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
             </div>
 
             {/* Percentiles */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
                 Percentile Benchmarks
               </p>
@@ -132,12 +132,12 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
                   { label: "95th", value: overall.p95 },
                   { label: "99th", value: overall.p99 },
                 ].map((p) => (
-                  <div key={p.label} className="text-center bg-white border border-slate-200 rounded-lg p-3">
-                    <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                  <div key={p.label} className="text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3">
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                       {p.label} %ile
                     </p>
-                    <p className="text-xl font-extrabold text-slate-800 mt-0.5">{p.value}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xl font-extrabold text-slate-800 dark:text-slate-100 mt-0.5">{p.value}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
                       {(((p.value) / ((scope === "all6" ? 6 : 5) * 100)) * 100).toFixed(1)}%
                     </p>
                   </div>
@@ -202,42 +202,42 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-xs text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   <tr>
                     {["Section", "Students", "Pass %", "Mean", "Median", "Std Dev", "Min", "Max", "Topper"].map((h) => (
                       <th key={h} className="px-4 py-3 text-left font-semibold whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {classStats.map((c) => (
-                    <tr key={c.section} className="hover:bg-blue-50/40 transition-colors">
-                      <td className="px-4 py-3 font-bold text-slate-800 whitespace-nowrap">{c.section}</td>
-                      <td className="px-4 py-3 text-slate-600">{c.count}</td>
+                    <tr key={c.section} className="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition-colors">
+                      <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">{c.section}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{c.count}</td>
                       <td className="px-4 py-3">
-                        <span className={`font-semibold ${c.passRate === 100 ? "text-emerald-600" : "text-amber-600"}`}>
+                        <span className={`font-semibold ${c.passRate === 100 ? "text-emerald-600 dark:text-emerald-500" : "text-amber-600 dark:text-amber-500"}`}>
                           {c.passRate}%
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-700">
+                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
                         {c.mean.toFixed(1)}
-                        <span className="text-slate-400 font-normal text-xs ml-1">({c.meanPct}%)</span>
+                        <span className="text-slate-400 dark:text-slate-500 font-normal text-xs ml-1">({c.meanPct}%)</span>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">{c.median}</td>
-                      <td className="px-4 py-3 text-slate-600">{c.stdDev}</td>
-                      <td className="px-4 py-3 text-rose-600 font-medium">{c.min}</td>
-                      <td className="px-4 py-3 text-teal-700 font-medium">{c.max}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{c.median}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{c.stdDev}</td>
+                      <td className="px-4 py-3 text-rose-600 dark:text-rose-400 font-medium">{c.min}</td>
+                      <td className="px-4 py-3 text-teal-700 dark:text-teal-400 font-medium">{c.max}</td>
                       <td className="px-4 py-3">
-                        <div className="text-slate-700 font-medium text-xs">{c.topper}</div>
-                        <div className="text-slate-400 text-xs">{c.topperMarks} marks</div>
+                        <div className="text-slate-700 dark:text-slate-300 font-medium text-xs">{c.topper}</div>
+                        <div className="text-slate-400 dark:text-slate-500 text-xs">{c.topperMarks} marks</div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
                 {/* Totals row */}
-                <tfoot className="bg-blue-50 text-xs font-semibold text-blue-700 border-t-2 border-blue-200">
+                <tfoot className="bg-blue-50 dark:bg-slate-800 text-xs font-semibold text-blue-700 dark:text-blue-400 border-t-2 border-blue-200 dark:border-slate-700">
                   <tr>
                     <td className="px-4 py-3">SCHOOL TOTAL</td>
                     <td className="px-4 py-3">{overall.count}</td>
@@ -265,12 +265,12 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
               {subjectAvgs.map((s) => (
                 <div key={s.subjectName} className="flex items-center gap-3">
                   <div className="w-44 shrink-0 text-right">
-                    <p className="text-xs font-semibold text-slate-700 truncate" title={s.subjectName}>
+                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate" title={s.subjectName}>
                       {s.subjectName}
                     </p>
-                    <p className="text-[10px] text-slate-400">{s.count} students</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500">{s.count} students</p>
                   </div>
-                  <div className="flex-1 h-7 bg-slate-100 rounded-lg overflow-hidden relative">
+                  <div className="flex-1 h-7 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden relative">
                     <div
                       className="h-full rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
                       style={{ width: `${(s.avgMarks / maxSubjectAvg) * 100}%` }}
@@ -293,9 +293,9 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
             </div>
 
             {/* Subject stats summary table */}
-            <div className="overflow-x-auto rounded-xl border border-slate-200 mt-4">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 mt-4">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-xs text-slate-500 uppercase tracking-wider">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3 text-left">Subject</th>
                     <th className="px-4 py-3 text-right">Avg Marks</th>
@@ -304,11 +304,11 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
                     <th className="px-4 py-3 text-right">Topper</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {subjectAvgs.map((s) => (
-                    <tr key={s.subjectName} className="hover:bg-blue-50/40 transition-colors">
-                      <td className="px-4 py-2.5 text-slate-700 font-medium">{s.subjectName}</td>
-                      <td className="px-4 py-2.5 text-right font-bold text-slate-800">{s.avgMarks.toFixed(1)}</td>
+                    <tr key={s.subjectName} className="hover:bg-blue-50/40 dark:hover:bg-blue-900/20 transition-colors">
+                      <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300 font-medium">{s.subjectName}</td>
+                      <td className="px-4 py-2.5 text-right font-bold text-slate-800 dark:text-slate-100">{s.avgMarks.toFixed(1)}</td>
                       <td className="px-4 py-2.5 text-right">
                         <span className={`font-semibold ${
                           s.avgPct >= 90 ? "text-emerald-600" :
@@ -316,10 +316,10 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
                           s.avgPct >= 70 ? "text-sky-600" : "text-amber-600"
                         }`}>{s.avgPct.toFixed(1)}%</span>
                       </td>
-                      <td className="px-4 py-2.5 text-right text-slate-500">{s.count}</td>
+                      <td className="px-4 py-2.5 text-right text-slate-500 dark:text-slate-400">{s.count}</td>
                       <td className="px-4 py-2.5 text-right">
-                        <div className="text-slate-700 font-medium text-xs truncate max-w-[150px] ml-auto" title={s.topper}>{s.topper}</div>
-                        <div className="text-slate-400 text-[10px] font-bold">{s.topperMarks} marks</div>
+                        <div className="text-slate-700 dark:text-slate-300 font-medium text-xs truncate max-w-[150px] ml-auto" title={s.topper}>{s.topper}</div>
+                        <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold">{s.topperMarks} marks</div>
                       </td>
                     </tr>
                   ))}
