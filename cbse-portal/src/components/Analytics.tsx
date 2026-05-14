@@ -330,6 +330,9 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
         {/* ─── GRAPHS TAB ─── */}
         {tab === "graphs" && (
           <Graphs 
