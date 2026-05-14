@@ -95,7 +95,7 @@ export default function Graphs({
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                   <XAxis dataKey="label" stroke={textColor} fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                  <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                   <Bar dataKey="count" name="Students" radius={[4, 4, 0, 0]}>
                     {overall.marksDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill="#3b82f6" />
@@ -114,7 +114,7 @@ export default function Graphs({
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                   <XAxis dataKey="section" stroke={textColor} fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} domain={[0, 'dataMax + 10']} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                  <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                   <Bar dataKey="mean" name="Mean Marks" fill="#10b981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -135,7 +135,7 @@ export default function Graphs({
                     <PolarGrid stroke={gridColor} />
                     <PolarAngleAxis dataKey="subjectName" tick={{ fill: textColor, fontSize: 10 }} />
                     <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: textColor, fontSize: 10 }} />
-                    <Tooltip contentStyle={tooltipStyle} />
+                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} />
                     <Radar name="Average %" dataKey="avgPct" stroke="#6366f1" fill="#6366f1" fillOpacity={isDark ? 0.4 : 0.2} />
                   </RadarChart>
                 </ResponsiveContainer>
@@ -151,7 +151,7 @@ export default function Graphs({
                     <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                     <XAxis dataKey="subjectName" stroke={textColor} fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} domain={['dataMin - 5', 100]} />
-                    <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                     <Legend wrapperStyle={{ fontSize: '12px', color: textColor }} />
                     {sections.map((sec, idx) => (
                       <Line key={sec} type="monotone" dataKey={sec} name={sec} stroke={SECTION_COLORS[idx % SECTION_COLORS.length]} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
@@ -172,7 +172,7 @@ export default function Graphs({
                     <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
                     <XAxis type="number" stroke={textColor} fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis dataKey="subjectName" type="category" stroke={textColor} fontSize={10} tickLine={false} axisLine={false} width={100} />
-                    <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                     <Legend wrapperStyle={{ fontSize: '10px', color: textColor }} />
                     {["A1", "A2", "B1", "B2", "C1", "C2", "D", "E"].map((grade, idx) => (
                       <Bar key={grade} dataKey={grade} stackId="a" fill={GRADE_COLORS[idx]} />
@@ -184,18 +184,20 @@ export default function Graphs({
 
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Pass vs Fail per Subject</h3>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={subjectPassFail.slice(0, 8)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                    <XAxis dataKey="subjectName" stroke={textColor} fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
-                    <Legend wrapperStyle={{ fontSize: '12px', color: textColor }} />
-                    <Bar dataKey="passed" name="Pass" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                    <Bar dataKey="failed" name="Compartment/Fail" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="h-[300px] w-full overflow-x-auto custom-scrollbar">
+                <div style={{ minWidth: `${Math.max(100, subjectPassFail.length * 60)}px`, height: "100%" }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={subjectPassFail} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                      <XAxis dataKey="subjectName" stroke={textColor} fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                      <Legend wrapperStyle={{ fontSize: '12px', color: textColor }} />
+                      <Bar dataKey="passed" name="Pass" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
+                      <Bar dataKey="failed" name="Compartment/Fail" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
           </div>
@@ -213,7 +215,7 @@ export default function Graphs({
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                   <XAxis dataKey="gender" stroke={textColor} fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => v === "M" ? "Male" : v === "F" ? "Female" : v} />
                   <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} domain={[0, 'dataMax + 10']} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                  <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                   <Bar dataKey="mean" name="Mean Marks" radius={[4, 4, 0, 0]}>
                     {genderStats.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.gender === "M" ? "#3b82f6" : entry.gender === "F" ? "#ec4899" : "#8b5cf6"} />
@@ -232,7 +234,7 @@ export default function Graphs({
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                   <XAxis dataKey="gender" stroke={textColor} fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => v === "M" ? "Male" : v === "F" ? "Female" : v} />
                   <YAxis stroke={textColor} fontSize={12} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                  <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                   <Bar dataKey="count" name="Students" radius={[4, 4, 0, 0]}>
                     {genderStats.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.gender === "M" ? "#60a5fa" : entry.gender === "F" ? "#f472b6" : "#a78bfa"} />
@@ -256,7 +258,7 @@ export default function Graphs({
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
                   <XAxis type="number" stroke={textColor} fontSize={12} tickLine={false} axisLine={false} domain={[0, 'dataMax']} />
                   <YAxis dataKey="name" type="category" stroke={textColor} fontSize={10} tickLine={false} axisLine={false} width={120} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
+                  <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: isDark ? '#e2e8f0' : '#334155' }} labelStyle={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 'bold', marginBottom: '4px' }} cursor={{ fill: isDark ? '#1e293b' : '#f1f5f9' }} />
                   <Bar dataKey="marks" name="Total Marks" fill="#f59e0b" radius={[0, 4, 4, 0]} label={{ position: 'right', fill: textColor, fontSize: 10 }} />
                 </BarChart>
               </ResponsiveContainer>

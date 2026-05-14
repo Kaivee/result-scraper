@@ -71,9 +71,11 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
     { id: "classwise" as const, label: "Class-wise" },
     { id: "subjects" as const, label: "Subject-wise" },
     { id: "graphs" as const, label: "Graphs" },
+    { id: "failures" as const, label: "Compartment / Fail" },
   ];
 
   const [tab, setTab] = useState<typeof tabs[number]["id"]>("overview");
+  const [failSubjectFilter, setFailSubjectFilter] = useState("ALL");
 
   if (!students.length) return null;
 
@@ -350,6 +352,81 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
             subjectPassFail={subjectPassFail}
             top10={top10}
           />
+        )}
+
+        {/* ─── FAILURES TAB ─── */}
+        {tab === "failures" && (
+          <div className="space-y-5 animate-in fade-in duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100">Failure & Compartment Report</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Students with a non-passing grade in any subject.</p>
+              </div>
+              <select
+                value={failSubjectFilter}
+                onChange={(e) => setFailSubjectFilter(e.target.value)}
+                className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-auto p-2.5"
+              >
+                <option value="ALL">All Subjects</option>
+                {Array.from(new Set(students.flatMap(s => s.subjects.filter(sub => sub.passFail && sub.passFail !== "Pass" && sub.subjectName).map(sub => sub.subjectName)))).sort().map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <tr>
+                    <th className="px-4 py-3 text-left">Student</th>
+                    <th className="px-4 py-3 text-left">Roll No</th>
+                    <th className="px-4 py-3 text-left">Section</th>
+                    <th className="px-4 py-3 text-left">Failed Subject(s)</th>
+                    <th className="px-4 py-3 text-right">Total Marks</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {(() => {
+                    const failures = students.map(s => {
+                      const failedSubs = s.subjects.filter(sub => sub.passFail && sub.passFail !== "Pass");
+                      return { ...s, failedSubs };
+                    }).filter(s => {
+                      if (failSubjectFilter === "ALL") return s.failedSubs.length > 0;
+                      return s.failedSubs.some(sub => sub.subjectName === failSubjectFilter);
+                    });
+
+                    if (failures.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                            No students found with failures for the selected criteria.
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return failures.map(s => (
+                      <tr key={s.id} className="hover:bg-red-50/40 dark:hover:bg-red-900/10 transition-colors">
+                        <td className="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">{s.name}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{s.rollNumber}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{s.section}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-1">
+                            {s.failedSubs.map(sub => (
+                              <span key={sub.subjectCode} className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[10px] font-bold rounded">
+                                {sub.subjectName} ({sub.passFail})
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right font-medium text-slate-700 dark:text-slate-300">{s.totalMarks}</td>
+                      </tr>
+                    ));
+                  })()}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
     </div>
