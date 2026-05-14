@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import {
   ParsedStudent, SubjectScope,
-  computeOverallStats, computeClassStats, computeSubjectAverages, computeSubjectClassAverages
+  computeOverallStats, computeClassStats, computeSubjectAverages, computeSubjectClassAverages,
+  computeGenderStats, computeSubjectGradeDist, computeSubjectPassFail, computeTop10
 } from "@/lib/data";
 import Graphs from "./Graphs";
 
@@ -55,6 +56,10 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
   const classStats = useMemo(() => computeClassStats(students, scope), [students, scope]);
   const subjectAvgs = useMemo(() => computeSubjectAverages(students), [students]);
   const subjectClassAvgs = useMemo(() => computeSubjectClassAverages(students), [students]);
+  const genderStats = useMemo(() => computeGenderStats(students, scope), [students, scope]);
+  const subjectGradeDist = useMemo(() => computeSubjectGradeDist(students), [students]);
+  const subjectPassFail = useMemo(() => computeSubjectPassFail(students), [students]);
+  const top10 = useMemo(() => computeTop10(students, scope), [students, scope]);
 
   const maxGradeCount = Math.max(...Object.values(overall.gradeDistribution), 1);
   const maxDistCount = Math.max(...overall.marksDistribution.map((b) => b.count), 1);
@@ -340,6 +345,10 @@ export default function Analytics({ students, scope }: AnalyticsProps) {
             classStats={classStats}
             subjectAvgs={subjectAvgs}
             subjectClassAvgs={subjectClassAvgs}
+            genderStats={genderStats}
+            subjectGradeDist={subjectGradeDist}
+            subjectPassFail={subjectPassFail}
+            top10={top10}
           />
         )}
       </div>

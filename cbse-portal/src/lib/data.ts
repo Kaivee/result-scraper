@@ -260,3 +260,61 @@ export function computeSubjectClassAverages(students: ParsedStudent[]): SubjectC
     return result;
   }).sort((a, b) => (b.overallAvg as number) - (a.overallAvg as number));
 }
+
+export interface GenderStats { gender: string; count: number; mean: number; }
+export interface SubjectGradeDist { subjectName: string; A1: number; A2: number; B1: number; B2: number; C1: number; C2: number; D: number; E: number; }
+export interface SubjectPassFail { subjectName: string; passed: number; failed: number; }
+export interface TopStudent { name: string; marks: number; section: string; }
+
+export function computeGenderStats(students: ParsedStudent[], scope: SubjectScope): GenderStats[] {
+  const map: Record<string, { total: number, count: number }> = { "M": { total: 0, count: 0 }, "F": { total: 0, count: 0 } };
+  students.forEach(s => {
+    const g = s.sex === "M" || s.sex === "F" ? s.sex : "Other";
+    if (!map[g]) map[g] = { total: 0, count: 0 };
+    map[g].total += getScopedTotal(s, scope);
+    map[g].count += 1;
+  });
+  return Object.entries(map).filter(([_, d]) => d.count > 0).map(([gender, data]) => ({
+    gender, count: data.count, mean: parseFloat((data.total / data.count).toFixed(1))
+  }));
+}
+
+export function computeSubjectGradeDist(students: ParsedStudent[]): SubjectGradeDist[] {
+  const map: Record<string, SubjectGradeDist> = {};
+  students.forEach(s => {
+    s.subjects.forEach(sub => {
+      if (sub.grade && sub.subjectName) {
+        if (!map[sub.subjectName]) {
+          map[sub.subjectName] = { subjectName: sub.subjectName, A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0, D: 0, E: 0 };
+        }
+        const g = sub.grade as keyof Omit<SubjectGradeDist, "subjectName">;
+        if (map[sub.subjectName][g] !== undefined) map[sub.subjectName][g] += 1;
+      }
+    });
+  });
+  return Object.values(map).sort((a, b) => {
+    const totalA = a.A1 + a.A2 + a.B1 + a.B2 + a.C1 + a.C2 + a.D + a.E;
+    const totalB = b.A1 + b.A2 + b.B1 + b.B2 + b.C1 + b.C2 + b.D + b.E;
+    return totalB - totalA;
+  });
+}
+
+export function computeSubjectPassFail(students: ParsedStudent[]): SubjectPassFail[] {
+  const map: Record<string, SubjectPassFail> = {};
+  students.forEach(s => {
+    s.subjects.forEach(sub => {
+      if (sub.passFail && sub.subjectName) {
+        if (!map[sub.subjectName]) map[sub.subjectName] = { subjectName: sub.subjectName, passed: 0, failed: 0 };
+        if (sub.passFail === "Pass") map[sub.subjectName].passed += 1;
+        else map[sub.subjectName].failed += 1;
+      }
+    });
+  });
+  return Object.values(map).sort((a, b) => (b.passed + b.failed) - (a.passed + a.failed));
+}
+
+export function computeTop10(students: ParsedStudent[], scope: SubjectScope): TopStudent[] {
+  return [...students].sort((a, b) => getScopedTotal(b, scope) - getScopedTotal(a, scope))
+    .slice(0, 10)
+    .map(s => ({ name: s.name, marks: getScopedTotal(s, scope), section: s.section }));
+}
